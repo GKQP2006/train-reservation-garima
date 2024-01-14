@@ -11,7 +11,6 @@ const PORT = 3005;
 
 app.use(express.json());
 
-mongoose.connect(process.env.MONGO_URI);
 
 // Define the Seat model
 const seatSchema = new mongoose.Schema({
@@ -19,6 +18,9 @@ const seatSchema = new mongoose.Schema({
   rowNumber: { type: Number, required: true },
   status: { type: String, enum: ['empty', 'reserved', 'booked'], default: 'empty' },
 });
+
+mongoose.connect(process.env.MONGO_URI);
+
 
 const Seat = mongoose.model('Seat', seatSchema);
 
