@@ -19,8 +19,8 @@ connectToDatabase(); // Connect to MongoDB
 async function initializeSeats() {
   const existingSeats = await Seat.find();
   if (existingSeats.length === 0) {
-    for (let row = 1; row <= 11; row++) {
-      const totalSeatsInRow = row === 11 ? 3 : 7;
+    for (let row = 1; row <= 12; row++) {
+      const totalSeatsInRow = row === 12 ? 3 : 7;
       for (let seatNumber = 1; seatNumber <= totalSeatsInRow; seatNumber++) {
         await Seat.create({ seatNumber, rowNumber: row, status: 'empty' });
       }
