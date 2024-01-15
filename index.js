@@ -1,3 +1,4 @@
+
 // app.js
 require('dotenv').config();
 const express = require('express');
@@ -13,6 +14,8 @@ connectToDatabase(); // Connect to MongoDB
 
 // const Seat = mongoose.model('Seat', seatSchema);
 
+
+// Initialize the seats in the coach
 async function initializeSeats() {
   const existingSeats = await Seat.find();
   if (existingSeats.length === 0) {
@@ -119,6 +122,7 @@ function reserveSeatsInRow(seats, reservedSeats) {
 }
 
 app.post('/reset', async (req, res) => {
+
   try {
     await resetSeats();
     const seats = await Seat.find();
@@ -136,6 +140,7 @@ async function resetSeats() {
     throw error;
   }
 }
+
 
 async function startServer() {
   await initializeSeats();
