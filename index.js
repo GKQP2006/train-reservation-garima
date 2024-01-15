@@ -1,30 +1,19 @@
-// Connect to MongoDB (make sure your MongoDB server is running)
-// mongoose.connect('mongodb+srv://hr43c6861:nxtiN0momKW0q18H@cluster0.z8lkjd3.mongodb.net/?retryWrites=true&w=majority');
-require("dotenv").config();
 
+// app.js
+require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
-// const Seat = require('./models/seat');
+const { connectToDatabase } = require('./db');
+const Seat = require('./models/seat');
 
 const app = express();
-const PORT = 3005;
+const PORT = process.env.PORT || 3005;
 
 app.use(express.json());
 
-await(()=>{mongoose.connect(process.env.MONGO_URI);
-}, 1000)
+connectToDatabase(); // Connect to MongoDB
 
+// const Seat = mongoose.model('Seat', seatSchema);
 
-// Define the Seat model
-const seatSchema = new mongoose.Schema({
-  seatNumber: { type: Number, required: true },
-  rowNumber: { type: Number, required: true },
-  status: { type: String, enum: ['empty', 'reserved', 'booked'], default: 'empty' },
-});
-
-
-
-const Seat = mongoose.model('Seat', seatSchema);
 
 // Initialize the seats in the coach
 async function initializeSeats() {
@@ -58,7 +47,7 @@ app.post('/reserve', async (req, res) => {
     res.json({ message: 'Seats reserved successfully', reservedSeats, seats });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal Server Error' });
+    return 'Not enough available seats.';
   }
 });
 
@@ -133,23 +122,25 @@ function reserveSeatsInRow(seats, reservedSeats) {
 }
 
 app.post('/reset', async (req, res) => {
-    try {
-      await resetSeats();
-      const seats = await Seat.find();
-      res.json({ message: 'Seats reset successfully', seats });
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ message: 'Internal Server Error' });
-    }
-  });
 
-  async function resetSeats() {
-    try {
-      await Seat.updateMany({}, { status: 'empty' });
-    } catch (error) {
-      throw error;
-    }
+  try {
+    await resetSeats();
+    const seats = await Seat.find();
+    res.json({ message: 'Seats reset successfully', seats });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Internal Server Error' });
   }
+});
+
+async function resetSeats() {
+  try {
+    await Seat.updateMany({}, { status: 'empty' });
+  } catch (error) {
+    throw error;
+  }
+}
+
 
 async function startServer() {
   await initializeSeats();
